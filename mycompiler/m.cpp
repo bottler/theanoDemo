@@ -14,9 +14,12 @@ int main(int argc, char** argv){
 	for(int j=0; j<arg.size(); ++j)
 	{
 	  char c = arg[j];
-	  if(c==' ' || c=='\\' || c=='\t' || c=='\n' || c=='%')
-		s += '\\';
-	  s += c;
+	  if(c=='\t') s += "\\t";
+	  else if(c=='\\') s += "\\\\";
+	  else if(c=='\n') s += "\\\n";
+	  else if(c=='%') s += "\\%";
+	  else if(c==' ') s += "\\ ";
+	  else s += c;
 	}
 	s += ' ';
   }
