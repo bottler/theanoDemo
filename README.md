@@ -36,6 +36,7 @@ msub -I -q gpu -l walltime=08:00:00
 ---
 To run the demonstration of theano type
 ```
-python2.7 theanotry.py  
+python2.7 cpu.py  
+
 ```
 
