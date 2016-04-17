@@ -3,7 +3,8 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3"
 #os.environ["CUDA_VISIBLE_DEVICES"]="0,2,3"
 #os.environ["THEANO_FLAGS"]="cxx="
 #os.environ["THEANO_FLAGS"]="cxx=./myg++"
-os.environ["THEANO_FLAGS"]="cxx=./myg++,floatX=float32,dnn.enabled=False,device=gpu0"
+#os.environ["THEANO_FLAGS"]="cxx=./myg++,floatX=float32,dnn.enabled=False,device=gpu0"
+os.environ["THEANO_FLAGS"]="floatX=float32,dnn.enabled=False,device=gpu0"
 #os.environ["THEANO_FLAGS"]="floatX=float32,device=gpu0"
 import theano
 
