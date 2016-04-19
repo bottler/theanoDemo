@@ -20,9 +20,10 @@ Add the following line to the beginning (after the doc) of the function `dlimpor
    time.sleep(5)
 ```
 In the current theano (0.8) this will be line 266.
+Calling compile() on a keras model seems to call this function about 160 times, so the delay is about 13 minutes.
 
 ---
-Up till this point is just setup, and I think it will work either on the head node or on the gpu node. It is a bad idea, I don't totally understand why, to try to use theano, even trivially, on the head node - you get weird errors.
+Up till this point is just setup, and I think it will work either on the head node or on the gpu node. It is a bad idea, I don't totally understand why, to try to use theano, even trivially, on the head node - you get weird errors. However, communicating with github etc. is easier on the head node.
 
 So you want to be in a gpu node session, so type
 ```
