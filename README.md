@@ -13,6 +13,22 @@ Download Theano with the following command, which should also give you numpy and
 ```
 pip2.7 install --user Theano
 ```
+#Using icpc
+
+`icpc` is the recommended C++ compiler on tinis. 
+It seems to work OK with theano. 
+Just ignore the warnings about cxxflags. (Or comment them out in the theano source).
+I might set something like 
+```
+os.environ["THEANO_FLAGS"]="floatX=float32,dnn.enabled=False,device=gpu0,cxx=icpc"
+``` 
+
+There is a choice between using a full node and `msub`, where you control which GPUs you access with 
+`CUDA_VISIBLE_DEVICES` and a method I don't understand yet with `srun` and `sbatch` where it's automatic.
+
+---
+#Using GCC
+*Important*: The following and most of the rest of this repository documents some attempts to make theano work on tinis with the g++ compiler. The main difficulty is the need to wait after g++ returns before using its binary output, which is an unusual problem.
 
 We then hackishly edit Theano to make it wait after ever calling the compiler.
 Add the following line to the beginning (after the doc) of the function `dlimport` in the file `~/.local/lib/python2.7/site-packages/theano/gof/cmodule.py`
