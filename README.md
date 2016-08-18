@@ -28,6 +28,7 @@ Modify this block so the import always fails, e.g. by replacing the import state
 #Using icpc
 
 `icpc` is the recommended C++ compiler on tinis. It seems to work OK with theano. 
+
 ---
 There are warnings about cxxflags meaning that optimizations are not properly turned on. Basically theano doesn't rely on `-march=native` because it wants to cache binaries on the filesystem between uses, keyed by i.a. the compiler flags, and you might use more than one system setup with the same shared working directory. But theano can't correctly detect the native flags with icpc. You can add `gcc.cxxflags=-march=native` to your theano flags to turn off this behaviour without losing the goodness of `-march=native` (I haven't tested, but in practice, this goodness may not add up to much on our 64 bit architecture anyway), but you might want to be careful about the cache if you, e.g., are doing calculations both on  the cnode and gpu queues. Doing this comes with some warnings, which you might want to disable. 
 
@@ -54,6 +55,7 @@ to
                     _logger.info(
 ```
 to make it quieter.
+
 ---
 I might set something like 
 ```
