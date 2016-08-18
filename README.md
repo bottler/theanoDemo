@@ -2,7 +2,7 @@
 Demo of theano on tinis
 
 ---
-Enable python (every session) with one of the following two lines. You cannot have both. I suggest adding the following to your `.bashrc` file.
+Enable python (every session) with one of the following two lines. You cannot have both. You might want to add it to your `.bashrc` file.
 
 ```
 module load intel impi Python CUDA #for Python 2.7
@@ -27,13 +27,39 @@ Modify this block so the import always fails, e.g. by replacing the import state
 
 #Using icpc
 
-`icpc` is the recommended C++ compiler on tinis. 
-It seems to work OK with theano. 
-Just ignore the warnings about cxxflags. (Or comment them out in the theano source).
+`icpc` is the recommended C++ compiler on tinis. It seems to work OK with theano. 
+---
+There are warnings about cxxflags meaning that optimizations are not properly turned on. Basically theano doesn't rely on `-march=native` because it wants to cache binaries on the filesystem between uses, keyed by i.a. the compiler flags, and you might use more than one system setup with the same shared working directory. But theano can't correctly detect the native flags with icpc. You can add `gcc.cxxflags=-march=native` to your theano flags to turn off this behaviour without losing the goodness of `-march=native` (I haven't tested, but in practice, this goodness may not add up to much on our 64 bit architecture anyway), but you might want to be careful about the cache if you, e.g., are doing calculations both on  the cnode and gpu queues. Doing this comes with some warnings, which you might want to disable. 
+
+To do that, you'd proceed as follows. Edit the file `~/.local/lib/python3.5/site-packages/theano/gof/cmodule.py` (replace `3.5` with `2.7` if you need to) around line 1820 from 
+```
+        if ('g++' not in theano.config.cxx and
+                'clang++' not in theano.config.cxx and
+                'clang-omp++' not in theano.config.cxx):
+```
+to
+```
+        if (detect_march and 'g++' not in theano.config.cxx and
+                'clang++' not in theano.config.cxx and
+                'clang-omp++' not in theano.config.cxx):
+```
+(on current dev theano, but not any release version, this will look slightly different. There's an extra line about `icpc` in this `if` condition which looks spurious to me. As of 18 August 2016, dev theano doesn't detect `icpc` architecture flags correctly.)
+
+About 9 lines up from this is the main place where the warning telling us not to do what we're doing appears. Change 
+```
+                    _logger.warn(
+```
+to 
+```
+                    _logger.info(
+```
+to make it quieter.
+---
 I might set something like 
 ```
-os.environ["THEANO_FLAGS"]="floatX=float32,dnn.enabled=False,device=gpu0,cxx=icpc"
+os.environ["THEANO_FLAGS"]="floatX=float32,dnn.enabled=False,device=gpu0,cxx=icpc,gcc.cxxflags=-march=native"
 ``` 
+`cpuIntel.py` demonstrates using `icpc` without GPUs.
 
 There is a choice between using a full node and `msub`, where you control which GPUs you access with 
 `CUDA_VISIBLE_DEVICES`, and a method I don't understand yet with `srun` and `sbatch` where it's automatic.
@@ -60,7 +86,7 @@ rm -f a.out && g++ a.cpp -o- > a.out && chmod +x a.out && ./a.out
 I would think it possible to change `cmodule.py` so that it always collected its g++ output from standard output.
 
 ---
-Up till this point is just setup, and I think it will work either on the head node or on the gpu node. It is a bad idea, I don't totally understand why, to try to use theano, even trivially, on the head node - you get weird errors. However, communicating with github etc. is easier on the head node.
+Up till this point is just setup, and I think it will work either on the head node or on the gpu node. Communicating with github etc. is easier on the head node.
 
 So you want to be in a gpu node session, so type
 ```
@@ -72,7 +98,7 @@ msub -I -q gpu -l walltime=08:00:00
 ---
 To run the demonstration of theano type
 ```
-python2.7 gpu.py  
+python gpu.py  
 ```
 This does almost no work but demonstrates theano working with a gpu.
 Note that to choose the gpu to use, you have two controls - the `gpu0` in `THEANO_CONFIG` tells theano to use the first GPU, which means the gpu listed first in `CUDA_VISIBLE_DEVICES`.

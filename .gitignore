@@ -1,1 +1,3 @@
 myg++
+bin/nvcc
+bin/nvlink
