@@ -25,6 +25,28 @@ Modify this block so the import always fails, e.g. by replacing the import state
     from mpi4py import MPI_WELOVETINIS
 ```
 
+---
+
+For testing CUDA, it may be useful to install pycuda as follows. First try to install it on the login node:
+```
+pip install --user pycuda
+```
+This will fail (won't find -libcuda, and maybe won't find <cuda.h> etc either) but succeed in installing the dependencies.
+Then download pycuda (you can't download on the GPU node)
+```
+mkdir foo
+cd foo
+pip download pycuda
+```
+Then on a gpu node try
+```
+module load intel impi Python/3.5.1 CUDA
+export CPATH=$CPATH:/csc/tinis/software/Core/CUDA/7.5.18/include/ #not sure if needed
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/csc/tinis/software/Core/CUDA/7.5.18/lib64 #not sure if needed
+cd foo
+pip install --user pycuda<tab>
+```
+
 #Using icpc
 
 `icpc` is the recommended C++ compiler on tinis. It seems to work OK with theano. 
@@ -65,6 +87,11 @@ os.environ["THEANO_FLAGS"]="floatX=float32,dnn.enabled=False,device=gpu0,cxx=icp
 
 There is a choice between using a full node and `msub`, where you control which GPUs you access with 
 `CUDA_VISIBLE_DEVICES`, and a method I don't understand yet with `srun` and `sbatch` where it's automatic.
+
+The following should work with GPUs:
+module load intel impi Python/3.5.1 CUDA
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+python gpu.py
 
 ---
 #Using GCC

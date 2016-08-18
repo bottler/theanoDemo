@@ -5,6 +5,7 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3"
 #os.environ["THEANO_FLAGS"]="cxx=./myg++"
 #os.environ["THEANO_FLAGS"]="cxx=./myg++,floatX=float32,dnn.enabled=False,device=gpu0"
 os.environ["THEANO_FLAGS"]="floatX=float32,dnn.enabled=False,device=gpu0"
+os.environ["THEANO_FLAGS"]="floatX=float32,dnn.enabled=False,device=gpu0,cxx=icpc,nvcc.compiler_bindir=icpc"
 #os.environ["THEANO_FLAGS"]="floatX=float32,device=gpu0"
 import theano
 
@@ -18,5 +19,5 @@ import theano
 a=theano.tensor.fscalar()
 b=theano.function([a],[a*a])
 
-print "five times five is:", b(5.0)
+print ("five times five is:", b(5.0))
 
