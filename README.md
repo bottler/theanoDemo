@@ -32,7 +32,7 @@ Modify this block so the import always fails, e.g. by replacing the import state
 ---
 There are warnings about cxxflags meaning that optimizations are not properly turned on. Basically theano doesn't rely on `-march=native` because it wants to cache binaries on the filesystem between uses, keyed by i.a. the compiler flags, and you might use more than one system setup with the same shared working directory. But theano can't correctly detect the native flags with icpc. You can add `gcc.cxxflags=-march=native` to your theano flags to turn off this behaviour without losing the goodness of `-march=native` (I haven't tested, but in practice, this goodness may not add up to much on our 64 bit architecture anyway), but you might want to be careful about the cache if you, e.g., are doing calculations both on  the cnode and gpu queues. Doing this comes with some warnings, which you might want to disable. 
 
-To do that, you'd proceed as follows. Edit the file `~/.local/lib/python3.5/site-packages/theano/gof/cmodule.py` (replace `3.5` with `2.7` if you need to) around line 1820 from 
+To do that, you'd proceed as follows. Edit the file `~/.local/lib/python3.5/site-packages/theano/gof/cmodule.py` (replace `3.5` with `2.7` if you need to). Add the words `detect_march and` somewhere around line 1820, so it goes from 
 ```
         if ('g++' not in theano.config.cxx and
                 'clang++' not in theano.config.cxx and
@@ -44,7 +44,7 @@ to
                 'clang++' not in theano.config.cxx and
                 'clang-omp++' not in theano.config.cxx):
 ```
-(on current dev theano, but not any release version, this will look slightly different. There's an extra line about `icpc` in this `if` condition which looks spurious to me. As of 18 August 2016, dev theano doesn't detect `icpc` architecture flags correctly.)
+(on current dev theano, but not any release version, this will look slightly different. There's an extra line about `icpc` in this `if` condition which looks spurious to me. As of 18 August 2016, dev theano doesn't detect `icpc` architecture flags correctly.) 
 
 About 9 lines up from this is the main place where the warning telling us not to do what we're doing appears. Change 
 ```
@@ -54,7 +54,7 @@ to
 ```
                     _logger.info(
 ```
-to make it quieter.
+to make the message which ends `but we don't do it now` quieter.
 
 ---
 I might set something like 
